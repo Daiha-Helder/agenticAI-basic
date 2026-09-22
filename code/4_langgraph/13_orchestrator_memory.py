@@ -1,4 +1,5 @@
 import google.generativeai as genai
+from prompts import triage_system_prompt, triage_user_prompt
 from pydantic import BaseModel, Field
 from typing_extensions import TypedDict, Literal, Annotated
 from langchain.chat_models import init_chat_model
@@ -44,9 +45,6 @@ Alice
 """
 }
 
-llm = ChatGoogleGenerativeAI(
-    model='gemini-3.5-flash-lite',
-    temperature=0)
 
 class Router(BaseModel):
     """Analisa o e-mail não lido e roteia de acordo com seu conteúdo."""
@@ -60,3 +58,26 @@ class Router(BaseModel):
         "'notify' para informações importantes que não precisam de resposta, "
         "'respond' para e-mails que precisam de uma resposta",
     )
+
+llm = ChatGoogleGenerativeAI(
+    model='gemini-3.5-flash-lite',
+    temperature=0)
+
+llm_router = llm.with_structured_output(Router)
+
+system_prompt = triage_user_prompt.format(
+    full_name = profile["full_name"],
+    name = profile["name"],
+    examples = None,
+    user_profile_background = profile["user_profile_ground"],
+    triage_no = prompt_instructions["triage_rules"]["ignore"],
+    triage_notify = prompt_instructions["triage_rules"]["notify"],
+    triage_email = prompt_instructions["triage_rules"]["respond"]
+)
+
+user_prompt = triage_user_prompt.format(
+    author = email["from"],
+    to = email["to"],
+    subject = email["subject"],
+    email_thread = email["body"]
+)
