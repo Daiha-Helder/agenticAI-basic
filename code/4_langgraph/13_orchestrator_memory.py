@@ -13,6 +13,9 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+import warnings
+warnings.filterwarnings("ignore")
+
 GEMINI_APY_KEY = os.getenv('GEMINI_APY_KEY')
 TAVILY_API_KEY = os.getenv('TAVILY_API_KEY')
 
@@ -241,3 +244,60 @@ png = email_agent.get_graph(xray=True).draw_mermaid_png()
 with open("./data/email_agent.png", "wb") as f:
     f.write(png)
 
+
+email_input = {
+    "author": "Equipe de Marketing <marketing@amazingdeals.com>",
+    "to": "Sarah Chen <sarah.chen@company.com>",
+    "subject": "🔥 OFERTA EXCLUSIVA: Desconto por Tempo Limitado em Ferramentas para Desenvolvedores! 🔥",
+    "email_thread": """Prezado(a) Desenvolvedor(a),
+
+Não perca esta oportunidade INCRÍVEL! 
+
+🚀 POR TEMPO LIMITADO, obtenha 80% DE DESCONTO em nosso Pacote Premium para Desenvolvedores! 
+
+✨ RECURSOS:
+- Preenchimento de código revolucionário com IA
+- Ambiente de desenvolvimento baseado em nuvem
+- Suporte ao cliente 24/7
+- E muito mais!
+
+💰 Preço Normal: R$ 999/mês
+🎉 SEU PREÇO ESPECIAL: Apenas R$ 199/mês!
+
+🕒 Corra! Esta oferta expira em:
+APENAS 24 HORAS!
+
+Clique aqui para resgatar seu desconto: https://amazingdeals.com/special-offer
+
+Atenciosamente,
+Equipe de Marketing
+---
+Para cancelar a inscrição, clique aqui
+""",
+}
+
+response = email_agent.invoke({"email_input": email_input})
+for m in response["messages"]:
+    m.pretty_print()
+
+email_input = {
+    "author": "Alice Smith <alice.smith@company.com>",
+    "to": "Sarah Chen <sarah.chen@company.com>",
+    "subject": "Dúvida rápida sobre a documentação da API",
+    "email_thread": """Olá Sarah,
+
+Eu estava revisando a documentação da API para o novo serviço de autenticação e notei que alguns endpoints parecem estar faltando nas especificações. Você poderia me ajudar a esclarecer se isso foi intencional ou se devemos atualizar a documentação?
+
+Especificamente, estou procurando por:
+- /auth/refresh
+- /auth/validate
+
+Obrigada!
+Alice""",
+}
+
+response = email_agent.invoke({"email_input": email_input})
+
+
+for m in response["messages"]:
+    m.pretty_print()
